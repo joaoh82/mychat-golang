@@ -26,12 +26,26 @@ func RunHost(ip string) {
 	}
 	fmt.Println("New connection accepted")
 
+	for {
+		handleHost(conn)
+	}
+}
+
+func handleHost(conn net.Conn) {
 	reader := bufio.NewReader(conn)
 	message, readErr := reader.ReadString('\n')
 	if readErr != nil {
 		log.Fatal("Error: ", readErr)
 	}
 	fmt.Println("Message received: ", message)
+
+	fmt.Print("Send message: ")
+	replyReader := bufio.NewReader(os.Stdin)
+	replyMessage, replyErr := replyReader.ReadString('\n')
+	if replyErr != nil {
+		log.Fatal("Error: ", replyErr)
+	}
+	fmt.Fprint(conn, replyMessage)
 }
 
 // RunGuest takes an destination ip as an argument
@@ -42,6 +56,12 @@ func RunGuest(ip string) {
 	if dialErr != nil {
 		log.Fatal("Error: ", dialErr)
 	}
+	for {
+		handleGuest(conn)
+	}
+}
+
+func handleGuest(conn net.Conn) {
 	fmt.Print("Send message: ")
 	reader := bufio.NewReader(os.Stdin)
 	message, readErr := reader.ReadString('\n')
@@ -49,4 +69,11 @@ func RunGuest(ip string) {
 		log.Fatal("Error: ", readErr)
 	}
 	fmt.Fprint(conn, message)
+
+	replyReader := bufio.NewReader(conn)
+	replyMessage, replayErr := replyReader.ReadString('\n')
+	if replayErr != nil {
+		log.Fatal("Error: ", replayErr)
+	}
+	fmt.Fprint(conn, replyMessage)
 }
