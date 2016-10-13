@@ -75,5 +75,5 @@ func handleGuest(conn net.Conn) {
 	if replayErr != nil {
 		log.Fatal("Error: ", replayErr)
 	}
-	fmt.Fprint(conn, replyMessage)
+	fmt.Println("Message received:", replyMessage)
 }
